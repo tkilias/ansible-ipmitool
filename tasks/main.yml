@@ -11,27 +11,15 @@
     - ipmi_devintf
 
 - name: import secret variable file
-  include_vars: "vault.yml"
-  no_log: true
+  include_vars: "{{ ipmi_credentials }}"
+  when: ipmi_credentials is defined
+  # no_log: true
 
 #- debug: msg={{ ipmitool_ansible_password }}
 
 # Users
-- name: Create user settings ipmi
-  command: ipmitool user set name {{ item.value.id }} {{ item.key }}
-  with_dict: ipmitool_users
-
-- name: Update password user settings ipmi
-  command: ipmitool user set password {{ item.value.id }} {{ item.value.password }}
-  with_dict: ipmitool_users
-
-- name: Enable user settings ipmi
-  command: ipmitool user enable {{ item.value.id }}
-  with_dict: ipmitool_users
-
-- name: Channel setaccess ipmi
-  command: ipmitool channel setaccess 1 {{ item.value.id }} callin=on ipmi=on link=on callin=on privilege=4
-  with_dict: ipmitool_users
+- include: ipmi-user.yml
+  with_dict: "{{ ipmitool_users | default({}) }}"
 
 # Lan
 - name: Update network settings ipmi

@@ -1,0 +1,12 @@
+- block
+  - name: Create user settings ipmi
+    shell: ipmitool user set name {{ item.value.id }} {{ item.key }}
+
+-   name: Update password user settings ipmi
+    shell: ipmitool user set password {{ item.value.id }} {{ item.value.password }}
+
+-   name: Enable user settings ipmi
+    shell: ipmitool user enable {{ item.value.id }}
+
+  - name: Channel setaccess ipmi
+    shell: ipmitool channel setaccess 1 {{ item.value.id }} callin=on ipmi=on link=on callin=on privilege=4
