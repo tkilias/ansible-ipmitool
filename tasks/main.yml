@@ -9,9 +9,10 @@
   package: name=ipmitool state=latest
 
 - name: detect if the system supports IPMI via Inband communication
-  shell: "ipmi-locate | grep done"
+  shell: "ipmi-locate"
   register: ipmi_locate
+  ignore_errors: true
 
 - name: install ipmi kernel module and config ipmi
   include: "tasks/install_and_config.yml"
-  when: ipmi_locate.stdout != ""
+  when: ipmi_locate.rc is defined and ipmi_locate.rc == 0
