@@ -1,47 +1,17 @@
 ---
 # tasks file for ipmitool
 #
+
+- name: install ipmitool
+  package: name=freeipmi state=latest
+
 - name: install ipmitool
   package: name=ipmitool state=latest
 
-- name: load kernel module
-  modprobe: name={{ item }} state=present
-  with_items:
-    - ipmi_si
-    - ipmi_devintf
+- name: detect if the system supports IPMI via Inband communication
+  shell: "ipmi-locate | grep done"
+  register: ipmi_locate
 
-- name: import secret variable file
-  include_vars: "{{ ipmi_credentials }}"
-  when: ipmi_credentials is defined
-  # no_log: true
-
-#- debug: msg={{ ipmitool_ansible_password }}
-
-# Users
-- include: ipmi-user.yml
-  with_dict: "{{ ipmitool_users | default({}) }}"
-
-# Lan
-- name: Update network settings ipmi
-  command: ipmitool lan set 1 {{ item }}
-  with_items:
-    - ipsrc static
-    - arp respond on
-    - access on
-    - auth ADMIN MD5
-
-- name: Add static ipaddr
-  command: ipmitool lan set 1 ipaddr {{ item.ipaddr }}
-  with_items: ipmitool_lan
-  when: ipmitool_lan is defined
-
-- name: Add static netmask
-  command: ipmitool lan set 1 netmask {{ item.netmask }}
-  with_items: ipmitool_lan
-  when: ipmitool_lan is defined
-
-
-- name: Add static defgw
-  command: ipmitool lan set 1 defgw ipaddr {{ item.defgw }}
-  with_items: ipmitool_lan
-  when: ipmitool_lan is defined
+- name: install ipmi kernel module and config ipmi
+  include: "tasks/install_and_config.yml"
+  when: ipmi_locate.stdout != ""
