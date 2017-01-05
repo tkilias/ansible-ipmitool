@@ -15,4 +15,4 @@
 
 - name: install ipmi kernel module and config ipmi
   include: "tasks/install_and_config.yml"
-  when: ipmi_locate.rc is defined and ipmi_locate.rc == 0
+  when: ipmi_locate.rc is defined and ipmi_locate.rc == 0 and ipmi_locate.stdout is defined and ipmi_locate.stdout.find("done") != -1
