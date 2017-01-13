@@ -12,7 +12,8 @@
 #- debug: msg={{ ipmitool_ansible_password }}
 
 # Users
-- include: ipmi-user.yml
+- name: Create ipmi user
+  include: "ipmi-user.yml"
   with_dict: "{{ ipmitool_users | default({}) }}"
 
 # Lan
